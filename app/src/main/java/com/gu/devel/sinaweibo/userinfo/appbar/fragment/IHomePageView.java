@@ -6,7 +6,9 @@ public interface IHomePageView {
 
   void showButton();
 
-  void rotateProgressBar(float delta);
+  void rotateProgressBarBy(float delta);
+
+  void rotateProgressBarTo(float degree);
 
   void stopProgressBarAnim();
 

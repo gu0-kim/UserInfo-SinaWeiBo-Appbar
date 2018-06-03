@@ -1,6 +1,12 @@
 package com.gu.appbar.refresh;
 
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.gu.mvp.view.fragment.BaseFragment;
 
@@ -13,7 +19,27 @@ public abstract class AppbarRefreshFragment extends BaseFragment
 
   public abstract AppBarLayout getAppBarLayout();
 
+  @Nullable
+  @Override
+  public View onCreateView(
+      @NonNull LayoutInflater inflater,
+      @Nullable ViewGroup container,
+      @Nullable Bundle savedInstanceState) {
+    View view = super.onCreateView(inflater, container, savedInstanceState);
+    initAppBarRefreshHelper();
+    return view;
+  }
+
+  // call after getAppBarLayout() return NOT NULL!
   public void initAppBarRefreshHelper() {
+    if (getAppBarLayout() == null) {
+      try {
+        throw new Exception("----Appbar is null ! exception!----");
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      return;
+    }
     mHelper = new RefreshableAppBarHelper(getAppBarLayout(), APPBAR_MAX_PULL);
     ((RefreshableAppBarHelper) mHelper).setAppBarUiCallBack(this);
   }
@@ -62,5 +88,10 @@ public abstract class AppbarRefreshFragment extends BaseFragment
   public void clearAppBar() {
     mHelper.clearAppBar();
     mHelper = null;
+  }
+
+  @Override
+  public boolean isOpenState() {
+    return mHelper.isOpenState();
   }
 }

@@ -7,20 +7,16 @@ import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.ViewConfiguration;
 
 public class ScrollInterceptViewPager extends ViewPager {
   private boolean canHorizontalScroll;
   private int mLastMotionX, mLastMotionY;
   private int mActivePointerId;
-  private int mTouchSlop;
   private static final int INVALID_POINTER = -1;
   private static final String TAG = ScrollInterceptViewPager.class.getSimpleName();
 
   public ScrollInterceptViewPager(@NonNull Context context) {
-    super(context);
-    canHorizontalScroll = true;
-    mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop() / 2;
+    this(context, null);
   }
 
   public ScrollInterceptViewPager(@NonNull Context context, @Nullable AttributeSet attrs) {
@@ -34,7 +30,7 @@ public class ScrollInterceptViewPager extends ViewPager {
       mLastMotionX = (int) ev.getX();
       mLastMotionY = (int) ev.getY();
       mActivePointerId = ev.getPointerId(0);
-      canHorizontalScroll = true;
+      canHorizontalScroll = true; // 默认就是由viewpager拦截事件
     }
     return super.dispatchTouchEvent(ev);
   }
@@ -48,18 +44,19 @@ public class ScrollInterceptViewPager extends ViewPager {
           Log.e(TAG, "Invalid pointerId=" + mActivePointerId + " in onTouchEvent");
           break;
         }
+        // 默认是拦截，由viewpager处理。但如果检测到dy>dx，不拦截事件，交由子view recyclerView处理
         if (canHorizontalScroll) {
           int deltaY = Math.abs(mLastMotionY - (int) ev.getY());
           int deltaX = Math.abs(mLastMotionX - (int) ev.getX());
-          // 条件越苛刻，越容易执行下拉操作，越不容易执行viewpager水平滚动
-          if (deltaY > deltaX && deltaX > mTouchSlop && deltaY >= mTouchSlop) {
+          if (deltaY > deltaX) {
             canHorizontalScroll = false;
           }
         }
         mLastMotionX = (int) ev.getX();
         mLastMotionY = (int) ev.getY();
+        return canHorizontalScroll;
     }
-    return canHorizontalScroll && super.onInterceptTouchEvent(ev);
+    return super.onInterceptTouchEvent(ev);
   }
 
   public void setCanHorizontalScroll(boolean canHorizontalScroll) {

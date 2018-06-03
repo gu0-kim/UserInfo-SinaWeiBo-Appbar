@@ -45,6 +45,11 @@ public class DataAdapter extends IBaseAdapter<String, RecyclerView.ViewHolder> {
   }
 
   @Override
+  public int getItemCount() {
+    return super.getItemCount() + HEADER_COUNT;
+  }
+
+  @Override
   public int getItemViewType(int position) {
     return position == 0 ? DIVIDER_TYPE : DATA_VIEW_TYPE;
   }

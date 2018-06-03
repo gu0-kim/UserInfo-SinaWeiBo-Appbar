@@ -22,6 +22,8 @@ public interface IAppBarRefreshItem {
 
   void clearAppBar();
 
+  boolean isOpenState();
+
   //
   /** 界面回调接口 */
   interface AppBarUiCallBack {
@@ -40,7 +42,7 @@ public interface IAppBarRefreshItem {
     void onOpen();
 
     /** 介于“打开”和“折叠”之间的状态 */
-    void onMiddle(int offset);
+    void onMiddle(int scroll,int maxScroll);
 
     void startRefreshing();
   }

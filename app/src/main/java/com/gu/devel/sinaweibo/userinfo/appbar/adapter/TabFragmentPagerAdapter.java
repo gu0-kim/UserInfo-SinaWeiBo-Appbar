@@ -4,12 +4,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
+import android.view.ViewGroup;
 
 import com.gu.devel.sinaweibo.userinfo.appbar.fragment.RecyclerViewFragment;
 
 public class TabFragmentPagerAdapter extends FragmentPagerAdapter {
 
   private static final String[] TITLES = new String[] {"主页", "微博", "相册"};
+  private Fragment mCurrentFragment;
 
   public TabFragmentPagerAdapter(FragmentManager fm) {
     super(fm);
@@ -29,5 +31,19 @@ public class TabFragmentPagerAdapter extends FragmentPagerAdapter {
   @Override
   public CharSequence getPageTitle(int position) {
     return TITLES[position];
+  }
+
+  @Override
+  public void setPrimaryItem(ViewGroup container, int position, Object object) {
+    super.setPrimaryItem(container, position, object);
+    this.mCurrentFragment = (Fragment) object;
+  }
+
+  public Fragment getCurrentFragment() {
+    return mCurrentFragment;
+  }
+
+  public void clear() {
+    mCurrentFragment = null;
   }
 }

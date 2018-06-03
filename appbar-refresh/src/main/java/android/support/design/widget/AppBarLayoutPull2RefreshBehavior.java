@@ -17,13 +17,14 @@ import java.util.List;
 
 import static android.support.v4.view.ViewCompat.TYPE_NON_TOUCH;
 
-public class AppBarLayoutSpringBehavior extends AppBarLayout.Behavior {
-  private static final String TAG = AppBarLayoutSpringBehavior.class.getSimpleName();
+public class AppBarLayoutPull2RefreshBehavior extends AppBarLayout.Behavior {
+  private static final String TAG = AppBarLayoutPull2RefreshBehavior.class.getSimpleName();
   private static final int MAX_OFFSET_ANIMATION_DURATION = 600; // ms
-  private static final float PULL_MOVE_RATE = 0.7f;
+  private static final int PULL_RECOVER_DURATION = 400; // 回弹动画时间 ms
+  //  private static final float PULL_MOVE_RATE = 0.6f; // 滚动阻力系数
 
-  public interface SpringOffsetCallback {
-    void springCallback(int offset);
+  public interface PullOffsetCallback {
+    void onPullOffset(int offset);
   }
 
   private int mOffsetDelta;
@@ -32,12 +33,12 @@ public class AppBarLayoutSpringBehavior extends AppBarLayout.Behavior {
   private ValueAnimator mSpringRecoverAnimator;
   private ValueAnimator mFlingAnimator;
   private int mPreHeadHeight;
-  private SpringOffsetCallback mSpringOffsetCallback;
+  private PullOffsetCallback mPullOffsetCallback;
   private ValueAnimator mOffsetAnimator;
 
-  public AppBarLayoutSpringBehavior() {}
+  public AppBarLayoutPull2RefreshBehavior() {}
 
-  public AppBarLayoutSpringBehavior(Context context, AttributeSet attrs) {
+  public AppBarLayoutPull2RefreshBehavior(Context context, AttributeSet attrs) {
     super(context, attrs);
   }
 
@@ -137,7 +138,7 @@ public class AppBarLayoutSpringBehavior extends AppBarLayout.Behavior {
       final CoordinatorLayout coordinatorLayout, final AppBarLayout abl) {
     if (mSpringRecoverAnimator == null) {
       mSpringRecoverAnimator = new ValueAnimator();
-      mSpringRecoverAnimator.setDuration(200);
+      mSpringRecoverAnimator.setDuration(PULL_RECOVER_DURATION);
       mSpringRecoverAnimator.setInterpolator(new DecelerateInterpolator());
       mSpringRecoverAnimator.addUpdateListener(
           new ValueAnimator.AnimatorUpdateListener() {
@@ -317,7 +318,8 @@ public class AppBarLayoutSpringBehavior extends AppBarLayout.Behavior {
       int maxOffset,
       int type) {
     // 修改 newOffset
-    int originNew = newOffset > 0 ? (int) (newOffset * PULL_MOVE_RATE) : newOffset;
+    //    int originNew = newOffset > 0 ? (int) (newOffset * PULL_MOVE_RATE) : newOffset;
+    int originNew = newOffset;
     final int curOffset = getTopBottomOffsetForScrollingSibling();
     int consumed = 0;
     if (mOffsetSpring != 0 && newOffset < 0) {
@@ -370,6 +372,7 @@ public class AppBarLayoutSpringBehavior extends AppBarLayout.Behavior {
       // originNew);
       return originNew;
     }
+    // originNew/3
     updateSpringOffsetByscroll(coordinatorLayout, appBarLayout, mOffsetSpring + originNew / 3);
     consumed = getTopBottomOffsetForScrollingSibling() - originNew;
 
@@ -468,8 +471,7 @@ public class AppBarLayoutSpringBehavior extends AppBarLayout.Behavior {
       CoordinatorLayout coordinatorLayout, AppBarLayout appBarLayout, int offset) {
     if (appBarLayout.getHeight() < mPreHeadHeight || offset < 0) return;
     mOffsetSpring = offset;
-    Log.e(TAG, "----updateSpringHeaderHeight: mOffsetSpring=" + mOffsetSpring);
-    if (mSpringOffsetCallback != null) mSpringOffsetCallback.springCallback(mOffsetSpring);
+    if (mPullOffsetCallback != null) mPullOffsetCallback.onPullOffset(mOffsetSpring);
     CoordinatorLayout.LayoutParams layoutParams =
         (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
     layoutParams.height = mPreHeadHeight + offset;
@@ -481,12 +483,12 @@ public class AppBarLayoutSpringBehavior extends AppBarLayout.Behavior {
     return mOffsetSpring;
   }
 
-  public SpringOffsetCallback getSpringOffsetCallback() {
-    return mSpringOffsetCallback;
+  public PullOffsetCallback getPullOffsetCallback() {
+    return mPullOffsetCallback;
   }
 
-  public void setSpringOffsetCallback(SpringOffsetCallback springOffsetCallback) {
-    mSpringOffsetCallback = springOffsetCallback;
+  public void setPullOffsetCallback(PullOffsetCallback pullOffsetCallback) {
+    mPullOffsetCallback = pullOffsetCallback;
   }
 
   @VisibleForTesting

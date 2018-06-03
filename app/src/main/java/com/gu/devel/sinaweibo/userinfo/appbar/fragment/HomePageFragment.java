@@ -23,6 +23,8 @@ import com.gu.devel.sinaweibo.userinfo.appbar.widget.tablayout.TabLayout;
 import com.gu.devel.sinaweibo.userinfo.appbar.widget.viewpager.ScrollInterceptViewPager;
 import com.gu.mvp.glide.GlideApp;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -33,9 +35,10 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
-public class HomePageFragment extends AppbarRefreshFragment
-    implements IHomePageView {
+public class HomePageFragment extends AppbarRefreshFragment implements IHomePageView {
   private Unbinder mUnBinder;
 
   @BindView(R.id.app_bar)
@@ -70,6 +73,8 @@ public class HomePageFragment extends AppbarRefreshFragment
 
   private Animation mRotateAnimation;
   private CompositeDisposable mCompositeDisposable;
+  private static final int PULL_CHANGE_ROTATE_DEGREE = 3;
+  private TabFragmentPagerAdapter mAdapter;
 
   public static HomePageFragment newInstance() {
     return new HomePageFragment();
@@ -91,8 +96,8 @@ public class HomePageFragment extends AppbarRefreshFragment
     mCompositeDisposable = new CompositeDisposable();
     // 必须要有setSupportActionBar,关键
     setSupportActionBar(mToolbar);
-
-    viewPager.setAdapter(new TabFragmentPagerAdapter(getChildFragmentManager()));
+    mAdapter = new TabFragmentPagerAdapter(getChildFragmentManager());
+    viewPager.setAdapter(mAdapter);
     viewPager.setOffscreenPageLimit(3);
     tabLayout.setTabMode(TabLayout.MODE_FIXED);
     tabLayout.setSelectedTabIndicatorHeight(10);
@@ -104,8 +109,6 @@ public class HomePageFragment extends AppbarRefreshFragment
     tabLayout.setupWithViewPager(viewPager);
     // glide load
     glideLoadImage(getContext(), R.drawable.user_img, headerImg);
-
-    initAppBarRefreshHelper();
   }
 
   public void setSupportActionBar(Toolbar toolbar) {
@@ -115,6 +118,7 @@ public class HomePageFragment extends AppbarRefreshFragment
   @Override
   public void destroyView() {
     super.destroyView();
+    mAdapter.clear();
     mCompositeDisposable.dispose();
     mCompositeDisposable = null;
     mUnBinder.unbind();
@@ -154,10 +158,17 @@ public class HomePageFragment extends AppbarRefreshFragment
   }
 
   @Override
-  public void rotateProgressBar(float delta) {
+  public void rotateProgressBarBy(float delta) {
     pb.setPivotX(pb.getWidth() / 2);
     pb.setPivotY(pb.getHeight() / 2);
-    pb.setRotation(delta * 360);
+    pb.setRotation(pb.getRotation() + delta);
+  }
+
+  @Override
+  public void rotateProgressBarTo(float degree) {
+    pb.setPivotX(pb.getWidth() / 2);
+    pb.setPivotY(pb.getHeight() / 2);
+    pb.setRotation(degree);
   }
 
   @Override
@@ -171,41 +182,42 @@ public class HomePageFragment extends AppbarRefreshFragment
       mRotateAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.pb_rotate_anim);
     }
     pb.startAnimation(mRotateAnimation);
+    ((RecyclerViewFragment) mAdapter.getCurrentFragment()).startRefresh();
   }
 
   // ------------ AppBarUiCallBack ------------ //
 
   @Override
   public void onPull(int pullSize) {
-    viewPager.setCanHorizontalScroll(pullSize == 0);
-    headerLayout.setTranslationY(pullSize);
-    pb.setImageLevel(pullSize == 0 ? 0 : 2);
-    rotateProgressBar(0);
+    if (isOpenState()) pb.setImageLevel(pullSize == 0 ? 0 : 2);
+    rotateProgressBarTo(0);
+    lastRate = 0;
   }
+
+  private float lastRate;
 
   @Override
   public void onPullExceedRefreshSize(int exceedSize, int exceedMaxSize) {
-    float rate = (float) exceedSize / exceedMaxSize;
-    rotateProgressBar(rate);
+    float currentRate = (float) exceedSize / exceedMaxSize;
+    int degree = (int) ((currentRate - lastRate) * 120);
+    lastRate = currentRate;
+    rotateProgressBarBy(degree);
   }
 
   @Override
   public void onRebound(int offset) {
-    float rate = (float) offset / getMaxPull();
-    rotateProgressBar(rate);
+    rotateProgressBarBy(-PULL_CHANGE_ROTATE_DEGREE);
   }
 
   @Override
-  public void onMiddle(int offset) {
-    float rate = 1f - (float) offset / getMaxScroll();
+  public void onMiddle(int scroll, int maxScroll) {
+    float rate = 1f - (float) scroll / maxScroll;
     headerLayout.setAlpha(Math.max(0.5f, rate));
-    //    if (offset != mHelper.getMaxScroll()) {
     username.setVisibility(View.GONE);
     mToolbar.setBackgroundColor(0x00ffffff);
     back.setImageLevel(0);
     search.setImageLevel(0);
     pb.setImageLevel(0);
-    //    }
   }
 
   @Override
@@ -227,23 +239,29 @@ public class HomePageFragment extends AppbarRefreshFragment
   public void startRefreshing() {
     mCompositeDisposable.add(
         Observable.just("")
-            .doOnNext(
-                new Consumer<String>() {
+            .map(
+                new Function<String, List<String>>() {
                   @Override
-                  public void accept(String s) throws Exception {
+                  public List<String> apply(String s) {
                     showLoading();
+                    List<String> data = new ArrayList<>();
+                    for (int i = 0; i < 15; i++) {
+                      data.add(String.valueOf(i));
+                    }
+                    return data;
                   }
                 })
-            .delay(3000, TimeUnit.MILLISECONDS)
+            .delay(3000, TimeUnit.MILLISECONDS, Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                new Consumer<String>() {
+                new Consumer<List<String>>() {
                   @Override
-                  public void accept(String s) throws Exception {
+                  public void accept(List<String> data) {
                     stopProgressBarAnim();
                     showButton();
-                    rotateProgressBar(0);
+                    rotateProgressBarTo(0);
                     refreshFin();
+                    ((RecyclerViewFragment) mAdapter.getCurrentFragment()).update(data);
                   }
                 }));
   }

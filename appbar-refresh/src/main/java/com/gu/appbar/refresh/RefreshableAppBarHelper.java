@@ -2,13 +2,13 @@ package com.gu.appbar.refresh;
 
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.AppBarLayoutSpringBehavior;
+import android.support.design.widget.AppBarLayoutPull2RefreshBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.util.Log;
 
 public class RefreshableAppBarHelper
     implements AppBarLayout.OnOffsetChangedListener,
-        AppBarLayoutSpringBehavior.SpringOffsetCallback,
+        AppBarLayoutPull2RefreshBehavior.PullOffsetCallback,
         IAppBarRefreshItem {
 
   private AppBarLayout mAppBarLayout;
@@ -34,9 +34,9 @@ public class RefreshableAppBarHelper
     mAppBarLayout.addOnOffsetChangedListener(this);
     CoordinatorLayout.Behavior behavior =
         ((CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams()).getBehavior();
-    if (behavior instanceof AppBarLayoutSpringBehavior) {
-      AppBarLayoutSpringBehavior springBehavior = (AppBarLayoutSpringBehavior) behavior;
-      springBehavior.setSpringOffsetCallback(this);
+    if (behavior instanceof AppBarLayoutPull2RefreshBehavior) {
+      AppBarLayoutPull2RefreshBehavior springBehavior = (AppBarLayoutPull2RefreshBehavior) behavior;
+      springBehavior.setPullOffsetCallback(this);
     }
   }
 
@@ -54,16 +54,16 @@ public class RefreshableAppBarHelper
         mCallBack.onCollapsed();
       }
     } else {
-      mCallBack.onMiddle(-verticalOffset);
+      mCallBack.onMiddle(-verticalOffset, getMaxScroll());
       mCurrentCollapseState = AppBarCollapseState.MIDDLE;
     }
   }
 
   @Override
-  public void springCallback(int offset) {
+  public void onPullOffset(int offset) {
     if (mCallBack == null) return;
     if (mCurrentRefreshState == RefreshState.REBOUNDING) {
-      Log.e("TAG", "springCallback: ---------REBOUNDING!!!!--------");
+      Log.e("TAG", "onPullOffset: ---------REBOUNDING!!!!--------");
       // offset=0 时弹回原位置，开始刷新任务！
       if (offset == 0) {
         mCallBack.startRefreshing();
@@ -131,12 +131,18 @@ public class RefreshableAppBarHelper
       mAppBarLayout.removeOnOffsetChangedListener(this);
       CoordinatorLayout.Behavior behavior =
           ((CoordinatorLayout.LayoutParams) mAppBarLayout.getLayoutParams()).getBehavior();
-      if (behavior instanceof AppBarLayoutSpringBehavior) {
-        AppBarLayoutSpringBehavior springBehavior = (AppBarLayoutSpringBehavior) behavior;
-        springBehavior.setSpringOffsetCallback(null);
+      if (behavior instanceof AppBarLayoutPull2RefreshBehavior) {
+        AppBarLayoutPull2RefreshBehavior springBehavior =
+            (AppBarLayoutPull2RefreshBehavior) behavior;
+        springBehavior.setPullOffsetCallback(null);
       }
       mAppBarLayout = null;
     }
     mCallBack = null;
+  }
+
+  @Override
+  public boolean isOpenState() {
+    return mCurrentCollapseState == AppBarCollapseState.OPEN;
   }
 }
