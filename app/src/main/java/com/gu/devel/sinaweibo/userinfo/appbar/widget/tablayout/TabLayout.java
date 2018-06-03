@@ -298,7 +298,7 @@ public class TabLayout extends HorizontalScrollView {
 
   public TabLayout(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
-    rd = 4;
+    rd = 2;
     mRect = new RectF();
     ThemeUtils.checkAppCompatTheme(context);
 

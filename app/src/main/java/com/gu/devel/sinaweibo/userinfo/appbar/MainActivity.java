@@ -6,6 +6,7 @@ import com.gu.appbar.refresh.AppbarRefreshActivity;
 import com.gu.appbar.refresh.IAppBarRefreshItem;
 import com.gu.devel.sinaweibo.userinfo.appbar.app.AppBarApplication;
 import com.gu.devel.sinaweibo.userinfo.appbar.fragment.HomePageFragment;
+import com.gu.mvp.utils.leaks.CleanLeakUtils;
 
 public class MainActivity extends AppbarRefreshActivity {
 
@@ -32,6 +33,7 @@ public class MainActivity extends AppbarRefreshActivity {
   protected void onDestroy() {
     super.onDestroy();
     mFragment = null;
+    CleanLeakUtils.fixInputMethodManagerLeak(this);
     ((AppBarApplication) getApplication()).checkItem(this);
   }
 }

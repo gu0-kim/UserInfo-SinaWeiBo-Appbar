@@ -63,7 +63,6 @@ public class RefreshableAppBarHelper
   public void onPullOffset(int offset) {
     if (mCallBack == null) return;
     if (mCurrentRefreshState == RefreshState.REBOUNDING) {
-      Log.e("TAG", "onPullOffset: ---------REBOUNDING!!!!--------");
       // offset=0 时弹回原位置，开始刷新任务！
       if (offset == 0) {
         mCallBack.startRefreshing();

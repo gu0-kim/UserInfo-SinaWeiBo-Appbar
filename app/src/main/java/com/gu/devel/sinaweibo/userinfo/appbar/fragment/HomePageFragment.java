@@ -7,6 +7,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -100,9 +101,10 @@ public class HomePageFragment extends AppbarRefreshFragment implements IHomePage
     viewPager.setAdapter(mAdapter);
     viewPager.setOffscreenPageLimit(3);
     tabLayout.setTabMode(TabLayout.MODE_FIXED);
-    tabLayout.setSelectedTabIndicatorHeight(10);
+    tabLayout.setSelectedTabIndicatorHeight(dp2px(getContext(), 4));
     tabLayout.setSelectedTabIndicatorColor(
         ContextCompat.getColor(getContext(), R.color.orange_800));
+    tabLayout.setRd(dp2px(getContext(), 2));
     tabLayout.setTabGravity(TabLayout.GRAVITY_CENTER);
     tabLayout.setNeedSwitchAnimation(true);
     tabLayout.setIndicatorWidthWrapContent(true);
@@ -199,9 +201,9 @@ public class HomePageFragment extends AppbarRefreshFragment implements IHomePage
   @Override
   public void onPullExceedRefreshSize(int exceedSize, int exceedMaxSize) {
     float currentRate = (float) exceedSize / exceedMaxSize;
-    int degree = (int) ((currentRate - lastRate) * 120);
+    int deltaDegree = (int) ((currentRate - lastRate) * 120);
     lastRate = currentRate;
-    rotateProgressBarBy(degree);
+    rotateProgressBarBy(deltaDegree);
   }
 
   @Override
@@ -251,7 +253,7 @@ public class HomePageFragment extends AppbarRefreshFragment implements IHomePage
                     return data;
                   }
                 })
-            .delay(3000, TimeUnit.MILLISECONDS, Schedulers.io())
+            .delay(1000, TimeUnit.MILLISECONDS, Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 new Consumer<List<String>>() {
@@ -264,5 +266,11 @@ public class HomePageFragment extends AppbarRefreshFragment implements IHomePage
                     ((RecyclerViewFragment) mAdapter.getCurrentFragment()).update(data);
                   }
                 }));
+  }
+
+  public static int dp2px(Context context, float dpVal) {
+    return (int)
+        TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, dpVal, context.getResources().getDisplayMetrics());
   }
 }
