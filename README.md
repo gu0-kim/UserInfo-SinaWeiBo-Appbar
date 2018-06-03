@@ -10,14 +10,14 @@
 ## 效果
 - 下拉刷新效果
 
-![image]()
+![image](https://github.com/gu0-kim/UserInfo-SinaWeiBo-Appbar/blob/master/screen/pull2refresh.gif)
 
 ## UML
-![image]()
+![image](https://github.com/gu0-kim/UserInfo-SinaWeiBo-Appbar/blob/master/screen/UserInfo-SinaWeibo-AppBar.png)
 
 ## 使用方法
 
-具体参见[HomePageFragment](http://note.youdao.com/)和[MainActivity](http://note.youdao.com/)
+具体参见[HomePageFragment](https://github.com/gu0-kim/UserInfo-SinaWeiBo-Appbar/blob/master/app/src/main/java/com/gu/devel/sinaweibo/userinfo/appbar/fragment/HomePageFragment.java)和[MainActivity](https://github.com/gu0-kim/UserInfo-SinaWeiBo-Appbar/blob/master/app/src/main/java/com/gu/devel/sinaweibo/userinfo/appbar/MainActivity.java)
 
 ## 拖拽回调
 
