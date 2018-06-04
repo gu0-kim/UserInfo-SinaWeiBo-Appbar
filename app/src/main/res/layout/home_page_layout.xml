@@ -131,19 +131,19 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <com.gu.devel.sinaweibo.userinfo.appbar.widget.viewpager.ScrollInterceptViewPager
+    <com.gu.mvp.widget.viewpager.ScrollInterceptViewPager
         android:id="@+id/tabs_viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <com.gu.devel.sinaweibo.userinfo.appbar.widget.tablayout.TabLayout
+        <com.gu.mvp.widget.tablayout.TabLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:background="@drawable/tablayout_bg"
             app:layout_scrollFlags="scroll|enterAlways" />
 
-    </com.gu.devel.sinaweibo.userinfo.appbar.widget.viewpager.ScrollInterceptViewPager>
+    </com.gu.mvp.widget.viewpager.ScrollInterceptViewPager>
 
 </android.support.design.widget.CoordinatorLayout>
