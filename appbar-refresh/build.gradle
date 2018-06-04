@@ -23,6 +23,6 @@ dependencies {
 
     implementation rootProject.ext.dependencies["appcompat-v7"]
     implementation rootProject.ext.dependencies["design"]
-    implementation 'com.gu:mvplibrary:1.0.5'
+    implementation 'com.gu:mvplibrary:1.0.6'
 
 }

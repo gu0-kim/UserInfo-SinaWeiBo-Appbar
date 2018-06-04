@@ -10,9 +10,12 @@
 ## 效果
 - 下拉刷新效果
 
-![image](https://github.com/gu0-kim/UserInfo-SinaWeiBo-Appbar/blob/master/screen/pull2refresh.gif)
+![image](https://github.com/gu0-kim/UserInfo-SinaWeiBo-Appbar/blob/master/screen/refresh.gif)
 
-## UML
+- 不同页面的滚动同步
+
+![image](https://github.com/gu0-kim/UserInfo-SinaWeiBo-Appbar/blob/master/screen/scroll.gif)
+## UML图
 ![image](https://github.com/gu0-kim/UserInfo-SinaWeiBo-Appbar/blob/master/screen/UserInfo-SinaWeibo-AppBar.png)
 
 ## 使用方法

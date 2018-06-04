@@ -7,7 +7,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -20,9 +19,10 @@ import com.gu.appbar.refresh.AppbarRefreshFragment;
 import com.gu.devel.sinaweibo.userinfo.appbar.R;
 import com.gu.devel.sinaweibo.userinfo.appbar.adapter.TabFragmentPagerAdapter;
 import com.gu.devel.sinaweibo.userinfo.appbar.glide.GlideCircleTransformWithBorder;
-import com.gu.devel.sinaweibo.userinfo.appbar.widget.tablayout.TabLayout;
-import com.gu.devel.sinaweibo.userinfo.appbar.widget.viewpager.ScrollInterceptViewPager;
 import com.gu.mvp.glide.GlideApp;
+import com.gu.mvp.utils.dimen.DimenUtils;
+import com.gu.mvp.widget.tablayout.TabLayout;
+import com.gu.mvp.widget.viewpager.ScrollInterceptViewPager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,10 +101,11 @@ public class HomePageFragment extends AppbarRefreshFragment implements IHomePage
     viewPager.setAdapter(mAdapter);
     viewPager.setOffscreenPageLimit(3);
     tabLayout.setTabMode(TabLayout.MODE_FIXED);
-    tabLayout.setSelectedTabIndicatorHeight(dp2px(getContext(), 4));
+    if (getContext() != null)
+      tabLayout.setSelectedTabIndicatorHeight(DimenUtils.dp2px(getContext(), 4));
     tabLayout.setSelectedTabIndicatorColor(
         ContextCompat.getColor(getContext(), R.color.orange_800));
-    tabLayout.setRd(dp2px(getContext(), 2));
+    tabLayout.setRd(DimenUtils.dp2px(getContext(), 2));
     tabLayout.setTabGravity(TabLayout.GRAVITY_CENTER);
     tabLayout.setNeedSwitchAnimation(true);
     tabLayout.setIndicatorWidthWrapContent(true);
@@ -266,11 +267,5 @@ public class HomePageFragment extends AppbarRefreshFragment implements IHomePage
                     ((RecyclerViewFragment) mAdapter.getCurrentFragment()).update(data);
                   }
                 }));
-  }
-
-  public static int dp2px(Context context, float dpVal) {
-    return (int)
-        TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, dpVal, context.getResources().getDisplayMetrics());
   }
 }

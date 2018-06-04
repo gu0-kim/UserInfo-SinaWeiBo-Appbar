@@ -29,7 +29,7 @@ dependencies {
     androidTestImplementation rootProject.ext.dependencies["runner"]
     androidTestImplementation rootProject.ext.dependencies["espresso-core"]
     implementation project(':appbar-refresh')
-    implementation 'com.gu:mvplibrary:1.0.5'
+    implementation 'com.gu:mvplibrary:1.0.6'
 
     implementation rootProject.ext.dependencies["design"]
     implementation rootProject.ext.dependencies["butterknife"]
